@@ -1,0 +1,90 @@
+//Student Model
+package com.st1.student_record;
+import jakarta.persistence.*;
+
+@Entity
+public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+
+//Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface Studentrepository extends JpaRepository<Student, Long> {
+}
+
+//Controller
+package com.st1.student_record;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+    @Autowired
+    private Studentservice studentService;
+
+    @GetMapping
+    public List<Student> getAllStudents(){
+        return studentService.getAllStudents();
+    }
+
+    @PostMapping
+    public Student addStudent(@RequestBody Student student){
+        return studentService.addStudent(student);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteStudent(@PathVariable Long id){
+        studentService.deleteStudent(id);
+    }
+    
+}
+
+//Serivce
+import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class Studentservice {
+    @Autowired
+    private Studentrepository studentRepository;
+    public List<Student> getAllStudents() {
+      return studentRepository.findAll();
+    }
+    public Student addStudent(Student student) {
+      return studentRepository.save(student);
+    }
+    public void deleteStudent(Long id) {
+      studentRepository.deleteById(id);
+    }
+}
+
+
+
