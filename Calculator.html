@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        body{
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+            background-color: black;
+        }
+        .outer{
+            margin: 5rem;
+            display:flexbox;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid white;
+            border-radius: 9px;
+            box-shadow: 2px 2px 10px 2px rgb(255, 212, 226);
+        }
+        .display{
+            width: 99%;
+            height: 4rem;
+            font-size: 2rem;
+            text-align: right;
+            border: none;
+            outline: none;
+            background-color: rgb(236, 230, 230);
+            border-radius: 9px;
+        }
+        .chasis{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 1rem;
+            padding: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        button{
+            width: 4rem;
+            height: 4rem;
+            font-size: 2rem;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            border-radius: 2rem;
+            background-color: rgb(236, 230, 230);
+        }
+        .operation{
+            background-color: orange;
+            justify-content: center;
+            align-content: center;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="outer">
+    <input type="text" class="display">
+    <div class="chasis">
+        <button value="1">1</button>
+        <button value="2">2</button>
+        <button value="3">3</button>
+        <button value="4">4</button>
+        <button value="5">5</button>
+        <button value="6">6</button>
+        <button value="7">7</button>
+        <button value="8">8</button>
+        <button value="9">9</button>
+        <button value="0">0</button>
+        <button class="operation" value="+">+</button>
+        <button class="operation" value="-">-</button>
+        <button class="operation" value="*">*</button>
+        <button class="operation" value="/">/</button>
+        <button class="operation" value="=">=</button>
+        <button class="operation" value="C">C</button>
+    </div>
+</div>
+</body>
+<script>
+    let currentInput = '';
+    let operator = '';
+    let previousInput = '';
+
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+            let value = button.value;
+            if (value === 'C') {
+                currentInput = '';
+                previousInput = '';
+                operator = '';
+                updatedisplay('');
+            } else if (value === '=') {
+                if (currentInput && previousInput && operator) {
+                    currentInput = calculate(previousInput, operator, currentInput);
+                    previousInput = '';
+                    operator = '';
+                    updatedisplay(currentInput);
+                }
+            } else if (['+', '-', '*', '/'].includes(value)) {
+                if (currentInput) {
+                    if (previousInput) {
+                        previousInput = calculate(previousInput, operator, currentInput);
+                    } else {
+                        previousInput = currentInput;
+                    }
+                    operator = value;
+                    currentInput = '';
+                    updatedisplay(previousInput);
+                }
+            } else {
+                currentInput += value;
+                updatedisplay(currentInput);
+            }
+        });
+    });
+
+    function calculate(a, o, b) {
+        a = parseFloat(a);
+        b = parseFloat(b);
+
+        switch (o) {
+            case '+':
+                return (a + b).toString();
+            case '-':
+                return (a - b).toString();
+            case '*':
+                return (a * b).toString();
+            case '/':
+                return (a / b).toString();
+            default:
+                return '';
+        }
+    }
+
+    function updatedisplay(value) {
+        document.querySelector('.display').value = value;
+    }
+</script>
+</html>
