@@ -1,0 +1,134 @@
+//db.php
+<?php
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$dbname = 'session_control';
+
+$conn = new mysqli($host, $user, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+
+//index.php
+<?php
+include 'includes/db.php';
+session_start();
+
+define('MAX_CONCURRENT_SESSIONS', 3);
+define('SESSION_TIMEOUT', 300); // 5 minutes in seconds
+
+if (isset($_POST['login'])) {
+    $userId = 1; // Assume the user ID from database validation
+    $sessionId = session_id();
+
+    // Remove expired sessions
+    $conn->query("DELETE FROM user_sessions WHERE TIMESTAMPDIFF(SECOND, last_activity, NOW()) > " . SESSION_TIMEOUT);
+
+    // Count active sessions for this user
+    $result = $conn->query("SELECT COUNT(*) AS session_count FROM user_sessions WHERE user_id = $userId");
+    $sessionCount = $result->fetch_assoc()['session_count'];
+
+    if ($sessionCount >= MAX_CONCURRENT_SESSIONS) {
+        echo "You have reached the maximum number of concurrent sessions. Please log out from another device.";
+        exit;
+    }
+
+    // Add this session to the database
+    $stmt = $conn->prepare("INSERT INTO user_sessions (user_id, session_id) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $sessionId);
+    if ($stmt->execute()) {
+        $_SESSION['user_id'] = $userId;
+        echo "Login successful!";
+        header("Location: home.php");
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    $stmt->close();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form method="POST" action="sessions.php">
+        <h2>Login</h2>
+        <button type="submit" name="login">Login</button>
+    </form>
+</body>
+</html>
+
+
+//sessions.php
+<?php
+include 'includes/db.php';
+session_start();
+
+define('SESSION_TIMEOUT', 300); 
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$userId = $_SESSION['user_id'];
+$sessionId = session_id();
+
+$result = $conn->query("SELECT * FROM user_sessions WHERE user_id = $userId AND session_id = '$sessionId'");
+if ($result->num_rows === 0) {
+    echo "Your session has expired or is invalid. Please log in again.";
+    session_destroy();
+    header("Location: login.php");
+    exit;
+}
+
+$conn->query("UPDATE user_sessions SET last_activity = NOW() WHERE session_id = '$sessionId'");
+
+echo "<h1>Welcome, User $userId</h1>";
+echo '<a href="logout.php">Logout</a>';
+?>
+
+
+//logout.php
+<?php
+include 'includes/db.php';
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+    $userId = $_SESSION['user_id'];
+    $sessionId = session_id();
+
+    // Remove the current session from the database
+    $conn->query("DELETE FROM user_sessions WHERE user_id = $userId AND session_id = '$sessionId'");
+
+    // Destroy the session
+    session_destroy();
+}
+
+header("Location: login.php");
+?>
+
+
+//Database
+CREATE DATABASE session_control;
+
+USE session_control;
+
+CREATE TABLE user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_id VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
