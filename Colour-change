@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Layout</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        header, footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 10px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+        }
+        .buttons button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+        .blue {
+            background-color: blue;
+        }
+        .orange {
+            background-color: orange;
+        }
+        .green {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Responsive Layout</h1>
+        </header>
+        <div class="content" id="colorSection">
+            <p>This section should change colour after clicking on the following buttons</p>
+        </div>
+        <div class="buttons">
+            <button class="blue" onclick="changeColor('blue')"></button>
+            <button class="orange" onclick="changeColor('orange')"></button>
+            <button class="green" onclick="changeColor('green')"></button>
+        </div>
+        <footer>
+            <p>Footer Section</p>
+        </footer>
+    </div>
+
+    <script>
+        function changeColor(color) {
+            document.getElementById('colorSection').style.backgroundColor = color;
+        }
+    </script>
+</body>
+</html>
