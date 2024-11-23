@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Chessboard</title>
+    <style>
+       body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+header, footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #333;
+    color: white;
+    width: 100%;
+}
+
+.chessboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.chessboard {
+    border-collapse: collapse;
+    width: 100%;
+    height: auto;
+}
+
+.chessboard td {
+    width: 12.5%;
+    padding-bottom: 12.5%; /* Maintain aspect ratio */
+    position: relative;
+}
+
+.chessboard td::before {
+    content: "";
+    display: block;
+    padding-top: 100%; /* Maintain aspect ratio */
+}
+
+.chessboard td:nth-child(even) {
+    background-color: #f0d9b5;
+}
+
+.chessboard td:nth-child(odd) {
+    background-color: #b58863;
+}
+
+.chessboard tr:nth-child(even) td:nth-child(odd),
+.chessboard tr:nth-child(odd) td:nth-child(even) {
+    background-color: #b58863;
+}
+
+.chessboard tr:nth-child(even) td:nth-child(even),
+.chessboard tr:nth-child(odd) td:nth-child(odd) {
+    background-color: #f0d9b5;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Responsive Chessboard</h1>
+    </header>
+    <div class="chessboard-container">
+        <table class="chessboard">
+            <tbody>
+                <!-- Chessboard rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <p>&copy; 2024 Chessboard Inc.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const chessboard = document.querySelector('.chessboard tbody');
+    for (let i = 0; i < 8; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 8; j++) {
+            const cell = document.createElement('td');
+            row.appendChild(cell);
+        }
+        chessboard.appendChild(row);
+    }
+});
+    </script>
+</body>
+</html>
