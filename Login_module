@@ -1,0 +1,236 @@
+//db.php
+<?php
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$dbname = 'login_system';
+
+$conn = new mysqli($host, $user, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+
+//Login.php
+<?php
+include 'includes/db.php';
+session_start();
+
+if (isset($_POST['login'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE username='$username'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['username'] = $user['username'];
+
+            // Set a cookie for tracking
+            setcookie('user', $user['username'], time() + (86400 * 30), "/"); // 30 days
+
+            header("Location: index.php");
+        } else {
+            $error = "Invalid password!";
+        }
+    } else {
+        $error = "User not found!";
+        header("Location: register.php");
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="POST" action="login.php">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+
+            <button type="submit" name="login">Login</button>
+            <button type="submit" name="login">Register</button>
+        </form>
+
+        <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+    </div>
+</body>
+</html>
+
+
+//register.php
+<?php include 'includes/db.php'; ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form method="POST" action="register.php">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+
+            <button type="submit" name="register">Register</button>
+        </form>
+
+        <?php
+        if (isset($_POST['register'])) {
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash password
+
+            $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+
+            if ($conn->query($sql) === TRUE) {
+                echo "<p class='success'>Registration successful! <a href='login.php'>Login</a></p>";
+            } else {
+                echo "<p class='error'>Error: " . $conn->error . "</p>";
+            }
+        }
+        ?>
+    </div>
+</body>
+</html>
+
+
+//index.php
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, <?php echo $_SESSION['username']; ?>!</h1>
+        <p>You are logged in.</p>
+        <a href="logout.php">Logout</a>
+    </div>
+</body>
+</html>
+
+
+//logout.php
+<?php
+session_start();
+session_destroy();
+
+// Remove cookie
+setcookie("user", "", time() - 3600, "/");
+
+header("Location: login.php");
+?>
+
+
+//style.css
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 400px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input, form button {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+//Database
+CREATE DATABASE login_system;
+
+USE login_system;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+
+
