@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Single Item Movement</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 200px;
+            height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        ul li {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        ul li:hover {
+            background-color: #bae7ff;
+        }
+
+        ul li.selected {
+            background-color: #91d5ff;
+            color: white;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .new-element {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>jQuery Single Item Movement</h1>
+    <div class="container">
+        <ul id="list1">
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 4</li>
+        </ul>
+
+        <div class="button-container">
+            <button id="moveToRight">Move to Right</button>
+            <button id="moveToLeft">Move to Left</button>
+            <button id="addToList1">Add New Item</button>
+        </div>
+
+        <ul id="list2">
+        </ul>
+    </div>
+
+    <div id="dynamicElement"></div>
+
+    <script>
+   
+        $(document).ready(function () {
+            
+            $("ul").on("click", "li", function () {
+                $(this).toggleClass("selected").siblings().removeClass("selected");
+            });
+        $("#moveToRight").click(function () {
+                const selectedItem = $("#list1 .selected");
+                if (selectedItem.length) {
+                    $("#list2").append(selectedItem.removeClass("selected"));
+                } else {
+                    alert("Please select an item to move.");
+                }
+            });
+        $("#moveToLeft").click(function () {
+                const selectedItem = $("#list2 .selected");
+                if (selectedItem.length) {
+                    $("#list1").append(selectedItem.removeClass("selected"));
+                } else {
+                    alert("Please select an item to move.");
+                }
+            });
+
+            $("#addToList1").click(function () {
+                const newItemText = prompt("Enter the text for the new item:");
+                if (newItemText) {
+                    const newItem = $("<li>").text(newItemText);
+                    $("#list1").append(newItem);
+                } else {
+                    alert("Item text cannot be empty!");
+                }
+            });
+
+            
+        });
+    </script>
+</body>
+</html>
