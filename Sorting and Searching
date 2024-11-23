@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Searching and Sorting</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Array Searching and Sorting</h1>
+
+        <!-- Integer Array Section -->
+        <div class="mb-5">
+            <h3>Integer Array</h3>
+            <div class="mb-3">
+                <input type="text" id="integerInput" class="form-control" placeholder="Enter integers separated by commas (e.g., 5,3,8,1)">
+            </div>
+            <button id="sortIntegerArray" class="btn btn-primary me-2">Sort</button>
+            <button id="searchIntegerArray" class="btn btn-secondary">Search</button>
+            <input type="text" id="integerSearchValue" class="form-control mt-2" placeholder="Enter value to search">
+            <div class="result-box" id="integerResult"></div>
+        </div>
+
+        <!-- Named Entity Array Section -->
+        <div>
+            <h3>Named Entity Array</h3>
+            <div class="mb-3">
+                <input type="text" id="nameInput" class="form-control" placeholder="Enter names separated by commas (e.g., John,Emily,Chris)">
+            </div>
+            <button id="sortNameArray" class="btn btn-primary me-2">Sort</button>
+            <button id="searchNameArray" class="btn btn-secondary">Search</button>
+            <input type="text" id="nameSearchValue" class="form-control mt-2" placeholder="Enter name to search">
+            <div class="result-box" id="nameResult"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Integer Array Sorting and Searching
+            $("#sortIntegerArray").click(function () {
+                const input = $("#integerInput").val();
+                if (!input) {
+                    $("#integerResult").text("Please enter integers separated by commas.");
+                    return;
+                }
+
+                // Convert input to array of numbers
+                let integerArray = input.split(",").map(Number);
+
+                // Check for invalid inputs
+                if (integerArray.some(isNaN)) {
+                    $("#integerResult").text("Invalid input. Ensure all values are integers.");
+                    return;
+                }
+
+                // Sort the array
+                integerArray.sort((a, b) => a - b);
+                $("#integerResult").text("Sorted Array: " + integerArray.join(", "));
+            });
+
+            $("#searchIntegerArray").click(function () {
+                const input = $("#integerInput").val();
+                const searchValue = parseInt($("#integerSearchValue").val());
+
+                if (!input || isNaN(searchValue)) {
+                    $("#integerResult").text("Please enter valid integers and a search value.");
+                    return;
+                }
+
+                // Convert input to array of numbers
+                const integerArray = input.split(",").map(Number);
+                const index = integerArray.indexOf(searchValue);
+
+                if (index === -1) {
+                    $("#integerResult").text("Value not found in the array.");
+                } else {
+                    $("#integerResult").text(`Value ${searchValue} found at index ${index}.`);
+                }
+            });
+
+            // Named Entity Array Sorting and Searching
+            $("#sortNameArray").click(function () {
+                const input = $("#nameInput").val();
+                if (!input) {
+                    $("#nameResult").text("Please enter names separated by commas.");
+                    return;
+                }
+
+                // Convert input to array of strings
+                let nameArray = input.split(",").map(name => name.trim());
+
+                // Sort the array alphabetically
+                nameArray.sort();
+                $("#nameResult").text("Sorted Names: " + nameArray.join(", "));
+            });
+
+            $("#searchNameArray").click(function () {
+                const input = $("#nameInput").val();
+                const searchValue = $("#nameSearchValue").val().trim();
+
+                if (!input || !searchValue) {
+                    $("#nameResult").text("Please enter valid names and a search value.");
+                    return;
+                }
+
+                // Convert input to array of strings
+                const nameArray = input.split(",").map(name => name.trim());
+                const index = nameArray.indexOf(searchValue);
+
+                if (index === -1) {
+                    $("#nameResult").text("Name not found in the array.");
+                } else {
+                    $("#nameResult").text(`Name "${searchValue}" found at index ${index}.`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
